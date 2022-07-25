@@ -20,6 +20,12 @@ bg = pygame.transform.scale(bg, (432, 540))
 ground = pygame.image.load("img/ground.png")
 ground = pygame.transform.scale(ground, (432 + 36, 175))
 
+# define font
+font = pygame.font.SysFont('Arial', 60)
+
+# define colors
+white = (255, 255, 255)
+
 # define game variables
 groundScroll = 0
 scrollSpeed = 2
@@ -28,6 +34,12 @@ gameOver = False
 pipeGap = 200
 pipeFrequency = 2500 # milliseconds
 lastPipe = pygame.time.get_ticks() - pipeFrequency
+score = 0
+passPipe = False
+
+def DrawText(text, font, text_color, x, y):
+    img = font.render(text, True, text_color)
+    screen.blit(img, (x, y))
 
 class Pipe(pygame.sprite.Sprite):
     def __init__ (self, x, y, position):
@@ -120,6 +132,20 @@ while run:
 
     # draw the ground
     screen.blit(ground, (groundScroll, 540))
+
+    # check score
+    if len(pipeGroup) > 0:
+        if birdGroup.sprites()[0].rect.left > pipeGroup.sprites()[0].rect.left\
+            and birdGroup.sprites()[0].rect.right < pipeGroup.sprites()[0].rect.right\
+            and passPipe == False:
+                passPipe = True
+        if passPipe == True:
+            if birdGroup.sprites()[0].rect.left > pipeGroup.sprites()[0].rect.right:
+                score += 1
+                passPipe = False
+
+    # draw a score
+    DrawText(str(score), font, white, int(screenWidth)/2, 20)
 
     # look for collision
     if pygame.sprite.groupcollide(birdGroup, pipeGroup, False, False) or firstFlappy.rect.top < 0:
